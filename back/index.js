@@ -1,23 +1,25 @@
 const express = require('express');
-const mysqlDb = require('./mysqlDb');
 const cors = require('cors');
-const locations = require('./routes/locations');
-const categories = require('./routes/categories');
-const items = require('./routes/items');
-const upload = require('./routes/routesConfig')
+const mongoose = require('mongoose');
+const linksRoute = require('./app/linksRoute');
 
 const app = express();
-app.use(cors());
-app.use(express.json());
-app.use(express.static('public'));
-app.use('/', locations);
-app.use('/', categories);
-app.use('/', items);
-app.use(upload.array());
-const port = 8001;
 
-mysqlDb.connect().catch(e => console.log(e));
-app.listen(port, () => {
-    console.log(`Server started on ${port} port!`);
-});
+app.use(express.json());
+app.use(cors());
+
+const port = 8002;
+
+app.use('/links', linksRoute);
+
+const run = async () => {
+    await mongoose.connect('mongodb://localhost');
+
+    app.listen(port, () => {
+        console.log('Server started on port ', port);
+    });
+};
+
+run().catch(e => console.log(e));
+
 
